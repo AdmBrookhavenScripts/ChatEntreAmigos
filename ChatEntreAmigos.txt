@@ -164,7 +164,7 @@ local function observePlayer(player)
 	task.spawn(function()
 		local bag = player:WaitForChild("PlayersBag", 10)
 		if not bag then return end
-		local rp = bag:WaitForChild("RPBio", 10)
+		local rp = bag:WaitForChild("RPName", 10)
 		if not rp then return end
 		local lastHandled = 0
 		if rp.Value ~= "" then
@@ -194,8 +194,8 @@ SendButton.MouseButton1Click:Connect(function()
 	if InputBox.Text == "" then return end
 	local text = InputBox.Text
 	InputBox.Text = ""
-	Remote:FireServer("RolePlayBio", text)
+	Remote:FireServer("RolePlayName", text)
 	task.wait(0.5)
-	Remote:FireServer("RolePlayBio", "")
+	Remote:FireServer("RolePlayName", "")
 end)
 end
