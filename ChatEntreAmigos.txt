@@ -138,12 +138,18 @@ end
 local function createExternalMessage(name, message, thumbnail)
 	notifyExternal(name, message, thumbnail)
 
-	local MessageFrame = Instance.new("Frame", ChatArea)
-	MessageFrame.Size = UDim2.new(1,-10,0,0)
-	MessageFrame.BackgroundColor3 = Color3.fromRGB(30,30,30)
-	MessageFrame.BorderSizePixel = 0
-	MessageFrame.AutomaticSize = Enum.AutomaticSize.Y
-	Instance.new("UICorner", MessageFrame).CornerRadius = UDim.new(0,8)
+    local MessageFrame = Instance.new("Frame", ChatArea)
+MessageFrame.Size = UDim2.new(1,-10,0,0)
+MessageFrame.BackgroundColor3 = Color3.fromRGB(30,30,30)
+MessageFrame.BorderSizePixel = 0
+MessageFrame.AutomaticSize = Enum.AutomaticSize.Y
+Instance.new("UICorner", MessageFrame).CornerRadius = UDim.new(0,8)
+
+task.delay(165, function()
+	if MessageFrame and MessageFrame.Parent then
+		MessageFrame:Destroy()
+	end
+end)
 
 	local Avatar = Instance.new("ImageLabel", MessageFrame)
 	Avatar.Size = UDim2.new(0,36,0,36)
