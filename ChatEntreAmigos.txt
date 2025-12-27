@@ -141,7 +141,7 @@ end
 
 local function parseRichText(text)
 	text = text:gsub("%*%*(.-)%*%*", "<b>%1</b>")
-	text = text:gsub("(@[%w_]+)", "<font color=\"rgb(0,170,255)\">%1</font>")
+	text = text:gsub("(@[%w_]+)", "<b><font color=\"rgb(0,170,255)\">%1</font></b>")
 	return text
 end
 
