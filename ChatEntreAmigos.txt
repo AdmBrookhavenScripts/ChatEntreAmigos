@@ -14,21 +14,23 @@ ScreenGui.Name = "ChatFriends"
 ScreenGui.ResetOnSpawn = false
 
 local MainFrame = Instance.new("Frame", ScreenGui)
-MainFrame.Size = UDim2.new(0, 420, 0, 260)
-MainFrame.Position = UDim2.new(0.5, -210, 0.5, -130)
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 450, 0, 260)
+MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
 MainFrame.BackgroundColor3 = Color3.fromRGB(25,25,25)
 MainFrame.BackgroundTransparency = 0.2
 MainFrame.BorderSizePixel = 0
 MainFrame.Visible = false
 MainFrame.Active = true
 MainFrame.Draggable = true
-Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0,10)
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 10)
 
 local MinButton = Instance.new("ImageButton", ScreenGui)
-MinButton.Size = UDim2.new(0,40,0,40)
+MinButton.Size = UDim2.new(0,75,0,75)
 MinButton.Position = UDim2.new(0.500000, -393, 0.500000, -139)
 MinButton.BackgroundTransparency = 1
-MinButton.Image = "rbxassetid://89187866469033"
+MinButton.Image = "rbxassetid://109930881463220"
 MinButton.Active = true
 MinButton.Draggable = true
 
@@ -148,11 +150,25 @@ local function createExternalMessage(name, message, thumbnail)
 	notifyExternal(name, message, thumbnail)
 
     local MessageFrame = Instance.new("Frame", ChatArea)
-MessageFrame.Size = UDim2.new(1,-10,0,0)
+MessageFrame.Size = UDim2.new(1,-20,0,0)
 MessageFrame.BackgroundColor3 = Color3.fromRGB(30,30,30)
 MessageFrame.BorderSizePixel = 0
 MessageFrame.AutomaticSize = Enum.AutomaticSize.Y
 Instance.new("UICorner", MessageFrame).CornerRadius = UDim.new(0,8)
+
+local CopyButton = Instance.new("ImageButton", MessageFrame)
+CopyButton.Size = UDim2.new(0,18,0,18)
+CopyButton.Position = UDim2.new(1,-26,0,8)
+CopyButton.BackgroundTransparency = 1
+CopyButton.Image = "rbxassetid://139346215022591"
+CopyButton.Name = "CopyButton"
+CopyButton.AutoButtonColor = true
+CopyButton.ZIndex = 5
+CopyButton.MouseButton1Click:Connect(function()
+	if setclipboard then
+		setclipboard(message)
+	end
+end)
 
 task.delay(165, function()
 	if MessageFrame and MessageFrame.Parent then
@@ -168,7 +184,7 @@ end)
 
 	local NameButton = Instance.new("TextButton", MessageFrame)
 NameButton.Position = UDim2.new(0,50,0,5)
-NameButton.Size = UDim2.new(1,-58,0,14)
+NameButton.Size = UDim2.new(1,-230,0,14)
 NameButton.Text = name
 NameButton.BackgroundTransparency = 1
 NameButton.TextColor3 = Color3.fromRGB(255,255,255)
@@ -176,9 +192,10 @@ NameButton.Font = Enum.Font.GothamBold
 NameButton.TextSize = 14
 NameButton.TextXAlignment = Enum.TextXAlignment.Left
 NameButton.AutoButtonColor = false
+NameButton.ZIndex = 1
 
 NameButton.MouseButton1Click:Connect(function()
-	local mention = " @" .. name .. " "
+	local mention = "@" .. name .. " "
 	InputBox:CaptureFocus()
 
 	if InputBox.Text == "" then
