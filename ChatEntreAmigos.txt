@@ -73,10 +73,7 @@ ChatArea.ScrollingDirection = Enum.ScrollingDirection.Y
 local Layout = Instance.new("UIListLayout", ChatArea)
 Layout.Padding = UDim.new(0,6)
 Layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-	ChatArea.CanvasPosition = Vector2.new(
-		0,
-		math.max(0, Layout.AbsoluteContentSize.Y - ChatArea.AbsoluteWindowSize.Y)
-	)
+	ChatArea.CanvasPosition = Vector2.new(0, math.max(0, Layout.AbsoluteContentSize.Y - ChatArea.AbsoluteWindowSize.Y))
 end)
 
 local InputBox = Instance.new("TextBox", MainFrame)
@@ -200,9 +197,18 @@ end
 
 SendButton.MouseButton1Click:Connect(function()
 	if InputBox.Text == "" then return end
-	startSendingAnimation()
+
 	local text = InputBox.Text
 	InputBox.Text = ""
+
+	local thumb
+	pcall(function()
+		thumb = Players:GetUserThumbnailAsync(LocalPlayer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size150x150)
+	end)
+
+	createExternalMessage(LocalPlayer.Name, text, thumb)
+
+	startSendingAnimation()
 	task.spawn(function()
 		pcall(function()
 			sendMessage(text)
@@ -210,22 +216,6 @@ SendButton.MouseButton1Click:Connect(function()
 		stopSendingAnimation()
 	end)
 end)
-
-local lastTime = 0
-
-local init = Http({
-	Url = "https://eita7.vercel.app/api/chat.js",
-	Method = "GET"
-})
-
-if init and init.Body then
-	local data = HttpService:JSONDecode(init.Body)
-	for _, msg in ipairs(data) do
-		if msg.time and msg.time > lastTime then
-			lastTime = msg.time
-		end
-	end
-end
 
 task.spawn(function()
 	while true do
@@ -237,12 +227,12 @@ task.spawn(function()
 		if res and res.Body then
 			local data = HttpService:JSONDecode(res.Body)
 			for _, msg in ipairs(data) do
-				if msg.time > lastTime then
-					lastTime = msg.time
+				if msg.name ~= LocalPlayer.Name then
 					createExternalMessage(msg.name, msg.message, msg.thumbnail)
 				end
 			end
 		end
-		task.wait()
+
+		task.wait(1)
 	end
 end)
