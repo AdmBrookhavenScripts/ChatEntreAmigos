@@ -1,0 +1,267 @@
+if game.PlaceId == 4924922222 then
+if getgenv()._Chat then
+	return
+end
+getgenv()._Chat = true
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+local StarterGui = game:GetService("StarterGui")
+local HttpService = game:GetService("HttpService")
+local Http = request or http_request or syn.request
+
+local ScreenGui = Instance.new("ScreenGui", PlayerGui)
+ScreenGui.Name = "ChatFriends"
+ScreenGui.ResetOnSpawn = false
+
+local MainFrame = Instance.new("Frame", ScreenGui)
+MainFrame.Size = UDim2.new(0, 420, 0, 260)
+MainFrame.Position = UDim2.new(0.5, -210, 0.5, -130)
+MainFrame.BackgroundColor3 = Color3.fromRGB(25,25,25)
+MainFrame.BackgroundTransparency = 0.2
+MainFrame.BorderSizePixel = 0
+MainFrame.Visible = false
+MainFrame.Active = true
+MainFrame.Draggable = true
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0,10)
+
+local MinButton = Instance.new("ImageButton", ScreenGui)
+MinButton.Size = UDim2.new(0,40,0,40)
+MinButton.Position = UDim2.new(0.500000, -393, 0.500000, -139)
+MinButton.BackgroundTransparency = 1
+MinButton.Image = "rbxassetid://89187866469033"
+MinButton.Active = true
+MinButton.Draggable = true
+
+local minimized = true
+MinButton.MouseButton1Click:Connect(function()
+	minimized = not minimized
+	MainFrame.Visible = not minimized
+end)
+
+local SendingLabel = Instance.new("TextLabel", MainFrame)
+SendingLabel.Size = UDim2.new(0,170,0,20)
+SendingLabel.Position = UDim2.new(1,-180,0,8)
+SendingLabel.BackgroundTransparency = 1
+SendingLabel.TextColor3 = Color3.fromRGB(200,200,200)
+SendingLabel.Font = Enum.Font.Gotham
+SendingLabel.TextSize = 13
+SendingLabel.TextXAlignment = Enum.TextXAlignment.Right
+SendingLabel.Visible = false
+
+local TitleBar = Instance.new("TextLabel", MainFrame)
+TitleBar.Size = UDim2.new(1, -20, 0, 28)
+TitleBar.Position = UDim2.new(0, 10, 0, 6)
+TitleBar.Text = "Chat entre amigos (roblox)"
+TitleBar.Font = Enum.Font.GothamBold
+TitleBar.TextSize = 14
+TitleBar.TextColor3 = Color3.fromRGB(255, 255, 255)
+TitleBar.BackgroundTransparency = 1
+TitleBar.TextXAlignment = Enum.TextXAlignment.Left
+
+local ChatArea = Instance.new("ScrollingFrame", MainFrame)
+ChatArea.Position = UDim2.new(0,10,0,40)
+ChatArea.Size = UDim2.new(1,-20,1,-95)
+ChatArea.CanvasSize = UDim2.new(0,0,0,0)
+ChatArea.AutomaticCanvasSize = Enum.AutomaticSize.Y
+ChatArea.ScrollBarImageTransparency = 1
+ChatArea.BorderSizePixel = 0
+ChatArea.BackgroundTransparency = 1
+ChatArea.ScrollingDirection = Enum.ScrollingDirection.Y
+
+local Layout = Instance.new("UIListLayout", ChatArea)
+Layout.Padding = UDim.new(0,6)
+Layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+	ChatArea.CanvasPosition = Vector2.new(
+		0,
+		math.max(0, Layout.AbsoluteContentSize.Y - ChatArea.AbsoluteWindowSize.Y)
+	)
+end)
+
+local InputBox = Instance.new("TextBox", MainFrame)
+InputBox.Position = UDim2.new(0,10,1,-42)
+InputBox.Size = UDim2.new(1,-75,0,30)
+InputBox.PlaceholderText = "Digite uma mensagem aqui"
+InputBox.Text = ""
+InputBox.TextColor3 = Color3.new(1,1,1)
+InputBox.ClearTextOnFocus = false
+InputBox.BackgroundColor3 = Color3.fromRGB(30,30,30)
+InputBox.BorderSizePixel = 0
+InputBox.TextSize = 13
+InputBox.TextWrapped = true
+Instance.new("UICorner", InputBox).CornerRadius = UDim.new(0,8)
+
+local sending = false
+
+local function startSendingAnimation()
+	if sending then return end
+	sending = true
+	SendingLabel.Visible = true
+
+	task.spawn(function()
+		local dots = 0
+		while sending do
+			dots = (dots % 3) + 1
+			SendingLabel.Text = "Enviando mensagem" .. string.rep(".", dots)
+			task.wait(0.4)
+		end
+	end)
+end
+
+local function stopSendingAnimation()
+	sending = false
+	SendingLabel.Visible = false
+end
+
+local SendButton = Instance.new("ImageButton", MainFrame)
+SendButton.Position = UDim2.new(1,-55,1,-42)
+SendButton.Size = UDim2.new(0,30,0,30)
+SendButton.BackgroundTransparency = 1
+SendButton.Image = "rbxassetid://94352710651660"
+
+local function notifyExternal(name, message, thumbnail)
+	if not minimized then return end
+	pcall(function()
+		StarterGui:SetCore("SendNotification", {
+			Title = name,
+			Text = message,
+			Icon = thumbnail,
+			Duration = 5
+		})
+	end)
+end
+
+local function parseRichText(text)
+	text = text:gsub("%*%*(.-)%*%*", "<b>%1</b>")
+	return text
+end
+
+local function createExternalMessage(name, message, thumbnail)
+	notifyExternal(name, message, thumbnail)
+
+	local MessageFrame = Instance.new("Frame", ChatArea)
+	MessageFrame.Size = UDim2.new(1,-10,0,0)
+	MessageFrame.BackgroundColor3 = Color3.fromRGB(30,30,30)
+	MessageFrame.BorderSizePixel = 0
+	MessageFrame.AutomaticSize = Enum.AutomaticSize.Y
+	Instance.new("UICorner", MessageFrame).CornerRadius = UDim.new(0,8)
+
+	local Avatar = Instance.new("ImageLabel", MessageFrame)
+	Avatar.Size = UDim2.new(0,36,0,36)
+	Avatar.Position = UDim2.new(0,7,0,7)
+	Avatar.BackgroundTransparency = 1
+	Avatar.Image = thumbnail or ""
+
+	local NameLabel = Instance.new("TextLabel", MessageFrame)
+	NameLabel.Position = UDim2.new(0,50,0,5)
+	NameLabel.Size = UDim2.new(1,-58,0,14)
+	NameLabel.Text = name
+	NameLabel.BackgroundTransparency = 1
+	NameLabel.TextColor3 = Color3.fromRGB(255,255,255)
+	NameLabel.Font = Enum.Font.GothamBold
+	NameLabel.TextSize = 14
+	NameLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+	local MessageLabel = Instance.new("TextLabel", MessageFrame)
+	MessageLabel.Position = UDim2.new(0,50,0,22)
+	MessageLabel.Size = UDim2.new(1,-58,0,0)
+	MessageLabel.Text = parseRichText(message)
+	MessageLabel.TextWrapped = true
+	MessageLabel.BackgroundTransparency = 1
+	MessageLabel.TextColor3 = Color3.new(1,1,1)
+	MessageLabel.Font = Enum.Font.Gotham
+	MessageLabel.TextSize = 16
+	MessageLabel.AutomaticSize = Enum.AutomaticSize.Y
+	MessageLabel.TextXAlignment = Enum.TextXAlignment.Left
+	MessageLabel.TextYAlignment = Enum.TextYAlignment.Top
+	MessageLabel.RichText = true
+
+	task.defer(function()
+		local avatarHeight = Avatar.AbsoluteSize.Y + 14
+		local textHeight = MessageLabel.AbsoluteSize.Y + 30
+		MessageFrame.Size = UDim2.new(1,-10,0,math.max(avatarHeight, textHeight))
+	end)
+
+	task.delay(180, function()
+		if MessageFrame and MessageFrame.Parent then
+			MessageFrame:Destroy()
+		end
+	end)
+end
+
+local function sendMessage(text)
+	local thumb
+	pcall(function()
+		thumb = Players:GetUserThumbnailAsync(
+			LocalPlayer.UserId,
+			Enum.ThumbnailType.HeadShot,
+			Enum.ThumbnailSize.Size150x150
+		)
+	end)
+
+	Http({
+		Url = "https://eita7.vercel.app/api/chat.js",
+		Method = "POST",
+		Headers = {
+			["Content-Type"] = "application/json"
+		},
+		Body = HttpService:JSONEncode({
+			name = LocalPlayer.Name,
+			thumbnail = thumb,
+			message = text
+		})
+	})
+end
+
+SendButton.MouseButton1Click:Connect(function()
+	if InputBox.Text == "" then return end
+
+	startSendingAnimation()
+
+	local text = InputBox.Text
+	InputBox.Text = ""
+
+	task.spawn(function()
+		pcall(function()
+			sendMessage(text)
+		end)
+		stopSendingAnimation()
+	end)
+end)
+
+local lastTime = 0
+
+local res = Http({
+	Url = "https://eita7.vercel.app/api/chat.js",
+	Method = "GET"
+})
+
+if res and res.Body then
+	local data = HttpService:JSONDecode(res.Body)
+	local last = data[#data]
+	if last and last.time then
+		lastTime = last.time
+	end
+end
+
+task.spawn(function()
+	while true do
+		local res = Http({
+			Url = "https://eita7.vercel.app/api/chat.js",
+			Method = "GET"
+		})
+
+		if res and res.Body then
+			local data = HttpService:JSONDecode(res.Body)
+			for _, msg in ipairs(data) do
+				if msg.time > lastTime then
+					lastTime = msg.time
+					createExternalMessage(msg.name, msg.message, msg.thumbnail)
+				end
+			end
+		end
+		task.wait(0.75)
+	end
+end)
+end
