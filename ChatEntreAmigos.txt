@@ -132,7 +132,9 @@ local function notifyExternal(name, message, thumbnail)
 end
 
 local function parseRichText(text)
-	return text:gsub("%*%*(.-)%*%*", "<b>%1</b>")
+	text = text:gsub("%*%*(.-)%*%*", "<b>%1</b>")
+	text = text:gsub("(@[%w_]+)", "<font color=\"rgb(0,170,255)\">%1</font>")
+	return text
 end
 
 local function createExternalMessage(name, message, thumbnail)
@@ -157,15 +159,29 @@ end)
 	Avatar.BackgroundTransparency = 1
 	Avatar.Image = thumbnail or ""
 
-	local NameLabel = Instance.new("TextLabel", MessageFrame)
-	NameLabel.Position = UDim2.new(0,50,0,5)
-	NameLabel.Size = UDim2.new(1,-58,0,14)
-	NameLabel.Text = name
-	NameLabel.BackgroundTransparency = 1
-	NameLabel.TextColor3 = Color3.fromRGB(255,255,255)
-	NameLabel.Font = Enum.Font.GothamBold
-	NameLabel.TextSize = 14
-	NameLabel.TextXAlignment = Enum.TextXAlignment.Left
+	local NameButton = Instance.new("TextButton", MessageFrame)
+NameButton.Position = UDim2.new(0,50,0,5)
+NameButton.Size = UDim2.new(1,-58,0,14)
+NameButton.Text = name
+NameButton.BackgroundTransparency = 1
+NameButton.TextColor3 = Color3.fromRGB(255,255,255)
+NameButton.Font = Enum.Font.GothamBold
+NameButton.TextSize = 14
+NameButton.TextXAlignment = Enum.TextXAlignment.Left
+NameButton.AutoButtonColor = false
+
+NameButton.MouseButton1Click:Connect(function()
+	local mention = " @" .. name .. " "
+	InputBox:CaptureFocus()
+
+	if InputBox.Text == "" then
+		InputBox.Text = mention
+	else
+		InputBox.Text = InputBox.Text .. mention
+	end
+
+	InputBox.CursorPosition = #InputBox.Text + 1
+end)
 
 	local MessageLabel = Instance.new("TextLabel", MessageFrame)
 	MessageLabel.Position = UDim2.new(0,50,0,22)
@@ -249,6 +265,6 @@ task.spawn(function()
 				end
 			end
 		end
-		task.wait(1)
+		task.wait()
 	end
 end)
