@@ -342,9 +342,9 @@ end)
 	task.defer(function()
 	MessageFrame.Size = UDim2.new(
 		1,
-		-15,
+		-10,
 		0,
-		Content.AbsoluteSize.Y + 30
+		Content.AbsoluteSize.Y + 35
 	)
 end)
 end
