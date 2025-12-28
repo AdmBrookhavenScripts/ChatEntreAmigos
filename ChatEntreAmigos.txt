@@ -279,8 +279,8 @@ local function createExternalMessage(name, message, thumbnail)
 	Instance.new("UICorner", MessageFrame).CornerRadius = UDim.new(0,8)
 
     local CopyButton = Instance.new("ImageButton", MessageFrame)
-CopyButton.Size = UDim2.new(0,18,0,18)
-CopyButton.Position = UDim2.new(1,-26,0,5)
+CopyButton.Size = UDim2.new(0,15,0,15)
+CopyButton.Position = UDim2.new(1,-23,0,5)
 CopyButton.BackgroundTransparency = 1
 CopyButton.Image = "rbxassetid://139346215022591"
 CopyButton.Name = "CopyButton"
