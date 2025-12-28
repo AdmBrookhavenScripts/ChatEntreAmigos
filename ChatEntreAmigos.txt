@@ -17,7 +17,7 @@ local function parseRichText(text)
 end
 
 local FALLBACK_STICKER = "rbxassetid://74943353961959"
-local STICKERS_URL = "https://protected-roblox-scripts.onrender.com/3dfae9d90318913ecce6eb4c2074e7be"
+local STICKERS_URL = "https://github.com/AdmBrookhavenScripts/Stickers/raw/refs/heads/main/StickersList.txt"
 
 local function assetExists(assetId)
 	local success = pcall(function()
@@ -401,4 +401,5 @@ SendButton.MouseButton1Click:Connect(function()
 		sendMessage(text)
 		stopSendingAnimation()
 	end)
+
 end)
